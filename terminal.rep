@@ -1,0 +1,27 @@
+nat _n;
+nat _m;
+nat _h;
+
+string ***_mag;
+
+nat _grua;
+
+struct node {
+    nat _i;
+    nat _j;
+    nat _k;
+    nat _l;
+};
+
+cataleg<node> _cat;
+
+estrategia _est;
+
+list<contenidor> _espera;
+
+void retira_contenidor_auxiliar(const string &m);
+bool intenta_inserir_first_fit(const contenidor &c);
+bool intenta_inserir_lliure(const contenidor &c);
+bool posicio_valida(int i, int k, int j, nat mida);
+void recoloca_area_espera();
+void emmagatzema_contenidor(int i, int k, int j, nat mida, const contenidor &c);

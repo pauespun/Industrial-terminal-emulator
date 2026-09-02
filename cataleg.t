@@ -1,23 +1,51 @@
-#include "cataleg.hpp"
-
-cataleg::cataleg(const cataleg& c) {
-    this->_taula = c->_taula;
-    this->_M = c->_M;
-    this->_quants = c->_quants;
+template <typename Valor>
+int cataleg<Valor>::h(const string &k) const {
+    nat r = 0;
+    for (char c : k) r = (r * 131 + c) % _M;
+    return r;
 }
 
-cataleg::cataleg& operator=(const cataleg& c) {
-    this->_taula = c->_taula;
-    this->_M = c->_M;
-    this->_quants = c->_quants;
+template <typename Valor>
+cataleg<Valor>::node::node(const string &k, const Valor &v, node* seg) : _k(k), _v(v), _seg(seg) {}
+
+template <typename Valor>
+cataleg<Valor>::cataleg(nat numelems) : _M(numelems + 1), _quants(0) {
+    _taula = new node*[_M];
+    for (nat i = 0; i < _M; ++i) _taula[i] = nullptr;
+}
+
+template <typename Valor>
+cataleg<Valor>::cataleg(const cataleg& c) {
+    this->_taula = c._taula;
+    this->_M = c._M;
+    this->_quants = c._quants;
+}
+
+template <typename Valor>
+typename cataleg<Valor>::cataleg& cataleg<Valor>::operator=(const cataleg& c) {
+    this->_taula = c._taula;
+    this->_M = c._M;
+    this->_quants = c._quants;
     return *this;
 }
 
-cataleg::~cataleg() noexcept {
-
+template <typename Valor>
+cataleg<Valor>::~cataleg() noexcept {
+    for (nat i = 0; i < _M; ++i) {
+        node* p = _taula[i];
+        while (p) {
+            node* paux = p;
+            p = p->_seg;
+            delete paux;
+        }
+    }
+    delete[] _taula;
 }
 
-void cataleg::assig(const string &k, const Valor &v) {
+template <typename Valor>
+void cataleg<Valor>::assig(const string &k, const Valor &v) {
+    if (k.empty()) throw error(ClauStringBuit);
+    
     int i = h(k);
     node *p = _taula[i];
     bool trobat = false;
@@ -38,7 +66,8 @@ void cataleg::assig(const string &k, const Valor &v) {
     }
 }
 
-void cataleg::elimina(const string &k) {
+template <typename Valor>
+void cataleg<Valor>::elimina(const string &k) {
     nat i = h(k);
     node *p = _taula[i], *ant = nullptr;
     bool trobat = false;
@@ -56,14 +85,15 @@ void cataleg::elimina(const string &k) {
             _taula[i] = p->_seg;
         }
         else {
-            ant->seg = p->seg;
+            ant->_seg = p->_seg;
         }
         delete(p);
         _quants--;
-    }
+    } else throw error(ClauInexistent);
 }
 
-bool cataleg::existeix(const string &k) const noexcept {
+template <typename Valor>
+bool cataleg<Valor>::existeix(const string &k) const noexcept {
     int i = h(k);
     node *p = _taula[i];
     bool trobat = false;
@@ -78,10 +108,22 @@ bool cataleg::existeix(const string &k) const noexcept {
     return trobat;
 }
 
-Valor cataleg::operator[](const string &k) const {
-    return k;
+template <typename Valor>
+Valor cataleg<Valor>::operator[](const string &k) const {
+    if (k.empty()) throw error(ClauStringBuit);
+
+    int i = h(k);
+    node *p = _taula[i];
+
+    while (p) {
+        if (p->_k == k) return p->_v;
+        p = p->_seg;
+    }
+
+    throw error(ClauInexistent);
 }
 
-nat cataleg::quants() const noexcept {
+template <typename Valor>
+nat cataleg<Valor>  ::quants() const noexcept {
     return _quants;
 }

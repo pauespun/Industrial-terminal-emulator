@@ -1,6 +1,7 @@
 #include "ubicacio.hpp"
 
 ubicacio::ubicacio(int i, int j, int k) {
+    if (!(i >= 0 && j >= 0 && k >= 0) && !( (i == -1 && j == 0 && k == 0) || (i == -1 && j == -1 && k == -1)) ) throw error(UbicacioIncorrecta);
     this->i = i;
     this->j = j;
     this->k = k;
@@ -48,7 +49,7 @@ bool ubicacio::operator<(const ubicacio &u) const noexcept {
         }
         return this->j < u.j;
     }
-    return this->j < u.j;
+    return this->i < u.i;
 }
 
 bool ubicacio::operator>(const ubicacio &u) const noexcept {
@@ -58,7 +59,7 @@ bool ubicacio::operator>(const ubicacio &u) const noexcept {
         }
         return this->j > u.j;
     }
-    return this->j > u.j;
+    return this->i > u.i;
 }
 
 bool ubicacio::operator<=(const ubicacio &u) const noexcept {
